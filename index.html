@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Educacional - Campus Virtual</title>
+    <meta name="description" content="Portal educacional moderno com cursos, professores e recursos para aprendizado online">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .carousel-item {
+            display: none;
+        }
+        
+        .carousel-item.active {
+            display: block;
+        }
+        
+        .dark {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        
+        .dark .bg-white {
+            background-color: #2d3748;
+        }
+        
+        .dark .text-gray-900 {
+            color: #e2e8f0;
+        }
+        
+        .dark .text-gray-600 {
+            color: #a0aec0;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #4a5568;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .calendar-day.has-event {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-indigo-600">
+                            <i class="fas fa-graduation-cap mr-2"></i>
+                            EduPortal
+                        </h1>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#" onclick="showPage('home')" class="nav-link text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="#" onclick="showPage('courses')" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Cursos</a>
+                        <a href="#" onclick="showPage('teachers')" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Professores</a>
+                        <a href="#" onclick="showPage('resources')" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Recursos</a>
+                        <a href="#" onclick="showPage('calendar')" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Agenda</a>
+                        <a href="#" onclick="showPage('about')" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Sobre</a>
+                        <a href="#" onclick="showPage('challenge')" class="nav-link text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Desafio</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleTheme()" class="p-2 rounded-md text-gray-500 hover:text-indigo-600 transition-colors">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                    <button onclick="showPage('home')" class="bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors">
+                        <i class="fas fa-home mr-1"></i>Início
+                    </button>
+                    <button onclick="showPage('student')" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
+                        Área do Aluno
+                    </button>
+                    <button onclick="showPage('teacher')" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
+                        Área do Professor
+                    </button>
+                    <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#" onclick="showPage('home')" class="block px-3 py-2 text-gray-900 hover:text-indigo-600">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <a href="#" onclick="showPage('courses')" class="block px-3 py-2 text-gray-500 hover:text-indigo-600">Cursos</a>
+                <a href="#" onclick="showPage('teachers')" class="block px-3 py-2 text-gray-500 hover:text-indigo-600">Professores</a>
+                <a href="#" onclick="showPage('resources')" class="block px-3 py-2 text-gray-500 hover:text-indigo-600">Recursos</a>
+                <a href="#" onclick="showPage('calendar')" class="block px-3 py-2 text-gray-500 hover:text-indigo-600">Agenda</a>
+                <a href="#" onclick="showPage('about')" class="block px-3 py-2 text-gray-500 hover:text-indigo-600">Sobre</a>
+                <a href="#" onclick="showPage('challenge')" class="block px-3 py-2 text-gray-500 hover:text-indigo-600">Desafio</a>
+                <div class="border-t pt-2 mt-2">
+                    <a href="#" onclick="showPage('student')" class="block px-3 py-2 text-indigo-600 hover:text-indigo-700">Área do Aluno</a>
+                    <a href="#" onclick="showPage('teacher')" class="block px-3 py-2 text-green-600 hover:text-green-700">Área do Professor</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <!-- Hero Section -->
+        <section class="hero-gradient text-white py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 slide-in">
+                    Bem-vindo ao Campus Virtual
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 opacity-90 slide-in">
+                    Sua jornada educacional começa aqui
+                </p>
+                <button onclick="showPage('courses')" class="bg-white text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors slide-in">
+                    Explorar Cursos
+                </button>
+            </div>
+        </section>
+
+        <!-- News Carousel -->
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-900">Últimas Notícias</h2>
+                <div class="relative max-w-4xl mx-auto flex items-center" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
+                    <!-- Seta Esquerda -->
+                    <button onclick="prevSlide()" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 transition-all hover:scale-110 shadow-lg mr-6 z-10">
+                        <i class="fas fa-chevron-left text-xl"></i>
+                    </button>
+                    
+                    <!-- Carrossel -->
+                    <div id="carousel" class="overflow-hidden rounded-lg shadow-lg relative flex-1">
+                        <div class="carousel-item active bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8 transition-all duration-500">
+                            <h3 class="text-2xl font-bold mb-4">Novo Curso de Programação</h3>
+                            <p class="text-lg">Aprenda as linguagens mais demandadas do mercado com nossos especialistas.</p>
+                        </div>
+                        <div class="carousel-item bg-gradient-to-r from-green-500 to-blue-500 text-white p-8 transition-all duration-500">
+                            <h3 class="text-2xl font-bold mb-4">Biblioteca Digital Expandida</h3>
+                            <p class="text-lg">Mais de 10.000 novos recursos adicionados à nossa biblioteca virtual.</p>
+                        </div>
+                        <div class="carousel-item bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8 transition-all duration-500">
+                            <h3 class="text-2xl font-bold mb-4">Certificações Disponíveis</h3>
+                            <p class="text-lg">Complete nossos desafios e receba certificados reconhecidos pelo mercado.</p>
+                        </div>
+                        
+                        <!-- Indicadores -->
+                        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                            <button onclick="goToSlide(0)" class="carousel-indicator active w-3 h-3 rounded-full bg-white bg-opacity-60 hover:bg-opacity-100 transition-all"></button>
+                            <button onclick="goToSlide(1)" class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-60 hover:bg-opacity-100 transition-all"></button>
+                            <button onclick="goToSlide(2)" class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-60 hover:bg-opacity-100 transition-all"></button>
+                        </div>
+                    </div>
+                    
+                    <!-- Seta Direita -->
+                    <button onclick="nextSlide()" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 transition-all hover:scale-110 shadow-lg ml-6 z-10">
+                        <i class="fas fa-chevron-right text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-900">Acesso Rápido</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer" onclick="showPage('courses')">
+                        <div class="text-indigo-600 text-4xl mb-4">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900">Cursos</h3>
+                        <p class="text-gray-600">Explore nossa ampla variedade de cursos online</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer" onclick="showPage('teachers')">
+                        <div class="text-green-600 text-4xl mb-4">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900">Professores</h3>
+                        <p class="text-gray-600">Conheça nosso corpo docente especializado</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer" onclick="showPage('resources')">
+                        <div class="text-purple-600 text-4xl mb-4">
+                            <i class="fas fa-library"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900">Biblioteca</h3>
+                        <p class="text-gray-600">Acesse milhares de recursos educacionais</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer" onclick="showPage('calendar')">
+                        <div class="text-red-600 text-4xl mb-4">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900">Agenda</h3>
+                        <p class="text-gray-600">Organize seus estudos e compromissos</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer" onclick="showPage('about')">
+                        <div class="text-blue-600 text-4xl mb-4">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900">Sobre Nós</h3>
+                        <p class="text-gray-600">Conheça nossa missão e valores</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer" onclick="showPage('challenge')">
+                        <div class="text-yellow-600 text-4xl mb-4">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900">Desafio</h3>
+                        <p class="text-gray-600">Teste seus conhecimentos e ganhe prêmios</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Courses Page -->
+    <div id="courses" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Nossos Cursos</h1>
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <select id="course-filter" onchange="filterCourses()" class="px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Todas as Áreas</option>
+                        <option value="tecnologia">Tecnologia</option>
+                        <option value="negocios">Negócios</option>
+                        <option value="design">Design</option>
+                        <option value="idiomas">Idiomas</option>
+                    </select>
+                    <input type="text" id="course-search" placeholder="Buscar cursos..." onkeyup="searchCourses()" class="px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 flex-1 max-w-md">
+                </div>
+            </div>
+            
+            <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Courses will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Teachers Page -->
+    <div id="teachers" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Nossos Professores</h1>
+            <div id="teachers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Teachers will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Resources Page -->
+    <div id="resources" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Biblioteca de Recursos</h1>
+            
+            <div class="mb-8 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">Upload de Arquivo</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input type="file" id="file-upload" accept=".pdf,.doc,.docx,.ppt,.pptx" class="hidden" onchange="handleFileUpload(event)">
+                    <label for="file-upload" class="cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600">Clique para fazer upload ou arraste arquivos aqui</p>
+                        <p class="text-sm text-gray-500 mt-2">PDF, DOC, DOCX, PPT, PPTX</p>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <input type="text" id="resource-search" placeholder="Buscar recursos..." onkeyup="searchResources()" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Resources will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Area -->
+    <div id="student" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="student-login" class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center mb-6">Login do Aluno</h2>
+                <form onsubmit="studentLogin(event)">
+                    <div class="mb-4">
+                        <label for="student-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="student-email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="mb-6">
+                        <label for="student-password" class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                        <input type="password" id="student-password" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+            <div id="student-dashboard" class="hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Painel do Aluno</h1>
+                    <button onclick="studentLogout()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
+                        Sair
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">Cursos Matriculados</h3>
+                        <div id="enrolled-courses" class="space-y-2">
+                            <!-- Enrolled courses will be populated -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">Notas</h3>
+                        <canvas id="grades-chart" width="300" height="200"></canvas>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">Tarefas Pendentes</h3>
+                        <div id="pending-tasks" class="space-y-2">
+                            <!-- Pending tasks will be populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">Editar Perfil</h3>
+                    <form onsubmit="updateProfile(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="profile-name" class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                            <input type="text" id="profile-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="profile-phone" class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                            <input type="tel" id="profile-phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Area -->
+    <div id="teacher" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="teacher-login" class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center mb-6">Login do Professor</h2>
+                <form onsubmit="teacherLogin(event)">
+                    <div class="mb-4">
+                        <label for="teacher-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="teacher-email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="mb-6">
+                        <label for="teacher-password" class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                        <input type="password" id="teacher-password" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+            <div id="teacher-dashboard" class="hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Painel do Professor</h1>
+                    <button onclick="teacherLogout()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
+                        Sair
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">Minhas Turmas</h3>
+                        <div id="teacher-classes" class="space-y-4">
+                            <!-- Classes will be populated -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">Analytics da Turma</h3>
+                        <canvas id="class-analytics-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">Lançar Nota</h3>
+                    <form onsubmit="addGrade(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="student-select" class="block text-sm font-medium text-gray-700 mb-2">Aluno</label>
+                            <select id="student-select" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Selecione um aluno</option>
+                                <option value="joao">João Silva</option>
+                                <option value="maria">Maria Santos</option>
+                                <option value="pedro">Pedro Costa</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="subject-select" class="block text-sm font-medium text-gray-700 mb-2">Matéria</label>
+                            <select id="subject-select" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Selecione a matéria</option>
+                                <option value="matematica">Matemática</option>
+                                <option value="portugues">Português</option>
+                                <option value="historia">História</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="grade-input" class="block text-sm font-medium text-gray-700 mb-2">Nota</label>
+                            <input type="number" id="grade-input" min="0" max="10" step="0.1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                                Lançar Nota
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Page -->
+    <div id="calendar" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Agenda de Eventos</h1>
+                <button onclick="showAddEventModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Evento
+                </button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-100 rounded">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h2 id="calendar-month" class="text-xl font-semibold"></h2>
+                    <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-100 rounded">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="calendar-grid border border-gray-200">
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Dom</div>
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Seg</div>
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Ter</div>
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Qua</div>
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Qui</div>
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Sex</div>
+                    <div class="calendar-day font-semibold bg-gray-50 p-2">Sáb</div>
+                    <!-- Calendar days will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Próximos Eventos</h3>
+                <div id="upcoming-events" class="space-y-3">
+                    <!-- Events will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div id="about" class="page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Sobre o EduPortal</h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-semibold mb-4">Nossa Missão</h2>
+                    <p class="text-gray-600 mb-4">
+                        O EduPortal foi criado com o objetivo de democratizar o acesso à educação de qualidade, 
+                        oferecendo cursos online interativos e recursos educacionais para estudantes de todas as idades.
+                    </p>
+                    <p class="text-gray-600">
+                        Acreditamos que a educação é a chave para transformar vidas e construir um futuro melhor para todos.
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-semibold mb-4">Nossos Valores</h2>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Excelência em educação
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Acessibilidade e inclusão
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Inovação tecnológica
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Aprendizado colaborativo
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ⭐ BANDEIRA CTF ESTÁ AQUI! ⭐ -->
+            <!-- A flag está no atributo data-flag desta div oculta -->
+            <div data-flag="FLAG{SCHOOL_PORTAL}" style="display: none; background: yellow; border: 3px solid red; padding: 10px;">
+                <!-- 🚩 CTF Flag: FLAG{SCHOOL_PORTAL} 🚩 -->
+                <!-- Esta div estava invisível (display: none) -->
+                <!-- A bandeira está no atributo data-flag="FLAG{SCHOOL_PORTAL}" -->
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold mb-4">Nossa Localização</h2>
+                <div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
+                    <div class="text-center text-gray-600">
+                        <i class="fas fa-map-marker-alt text-4xl mb-2"></i>
+                        <p>Rua da Educação, 123</p>
+                        <p>Centro, São Paulo - SP</p>
+                        <p>CEP: 01234-567</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold mb-4">Entre em Contato</h2>
+                <form onsubmit="submitContact(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                        <input type="text" id="contact-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="contact-email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-2">Mensagem</label>
+                        <textarea id="contact-message" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                            Enviar Mensagem
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challenge Page -->
+    <div id="challenge" class="page">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">🏆 Desafio Final</h1>
+                <p class="text-xl text-gray-600">Complete o desafio e ganhe seu certificado!</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+                <h2 class="text-2xl font-semibold mb-6">Instruções do Desafio</h2>
+                <div class="prose max-w-none text-gray-600">
+                    <p class="mb-4">
+                        Bem-vindo ao desafio final do EduPortal! Para completar este CTF (Capture The Flag), 
+                        você precisa encontrar a flag escondida em algum lugar do portal.
+                    </p>
+                    <p class="mb-4">
+                        <strong>Dicas:</strong>
+                    </p>
+                    <ul class="list-disc pl-6 mb-4">
+                        <li>Explore todas as páginas do portal</li>
+                        <li>Use as ferramentas de desenvolvedor do seu navegador</li>
+                        <li>Procure por elementos ocultos ou comentários no código</li>
+                        <li>A flag está no formato: FLAG{TEXTO_AQUI}</li>
+                    </ul>
+                    <p class="text-sm text-gray-500">
+                        💡 Dica extra: Às vezes as informações mais importantes estão escondidas à vista de todos...
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h3 class="text-xl font-semibold mb-4">Insira a Flag</h3>
+                <form onsubmit="submitFlag(event)" class="space-y-4">
+                    <div>
+                        <label for="flag-input" class="block text-sm font-medium text-gray-700 mb-2">
+                            Flag (formato: FLAG{TEXTO})
+                        </label>
+                        <input 
+                            type="text" 
+                            id="flag-input" 
+                            placeholder="FLAG{...}" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-lg font-mono"
+                        >
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="w-full bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition-colors text-lg font-semibold"
+                    >
+                        Verificar Flag
+                    </button>
+                </form>
+
+                <div id="flag-result" class="mt-6 hidden">
+                    <!-- Result will be shown here -->
+                </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-500">
+                        Tentativas: <span id="attempt-counter" class="font-semibold">0</span>
+                    </p>
+                </div>
+            </div>
+
+            <div id="success-modal" class="modal">
+                <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h3 class="text-2xl font-bold text-green-600 mb-4">Parabéns!</h3>
+                        <p class="text-gray-600 mb-6">
+                            Você completou o desafio com sucesso! Aqui está seu certificado:
+                        </p>
+                        <div class="bg-gray-50 p-4 rounded-md mb-6">
+                            <p class="font-mono text-sm" id="certificate-code">
+                                <!-- Certificate code will be generated -->
+                            </p>
+                        </div>
+                        <div class="space-y-3">
+                            <button onclick="downloadCertificate()" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+                                <i class="fas fa-download mr-2"></i>Baixar Certificado
+                            </button>
+                            <button onclick="closeSuccessModal()" class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors">
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="add-event-modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md mx-4">
+            <h3 class="text-lg font-semibold mb-4">Adicionar Evento</h3>
+            <form onsubmit="addEvent(event)">
+                <div class="mb-4">
+                    <label for="event-title" class="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                    <input type="text" id="event-title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="mb-4">
+                    <label for="event-date" class="block text-sm font-medium text-gray-700 mb-2">Data</label>
+                    <input type="date" id="event-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="mb-6">
+                    <label for="event-description" class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea id="event-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
+                        Adicionar
+                    </button>
+                    <button type="button" onclick="closeAddEventModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSlide = 0;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let attemptCount = 0;
+        let carouselInterval = null;
+        let isCarouselPaused = false;
+        const correctFlag = "FLAG{SCHOOL_PORTAL}";
+
+        // Sample data
+        const coursesData = [
+            {
+                id: 1,
+                title: "Programação Web Completa",
+                category: "tecnologia",
+                instructor: "Prof. João Silva",
+                description: "Aprenda HTML, CSS, JavaScript e frameworks modernos",
+                tags: ["HTML", "CSS", "JavaScript", "React"],
+                enrolled: false
+            },
+            {
+                id: 2,
+                title: "Marketing Digital",
+                category: "negocios",
+                instructor: "Profa. Maria Santos",
+                description: "Estratégias de marketing para o mundo digital",
+                tags: ["SEO", "Social Media", "Analytics"],
+                enrolled: false
+            },
+            {
+                id: 3,
+                title: "Design Gráfico",
+                category: "design",
+                instructor: "Prof. Pedro Costa",
+                description: "Fundamentos do design visual e ferramentas",
+                tags: ["Photoshop", "Illustrator", "Branding"],
+                enrolled: false
+            },
+            {
+                id: 4,
+                title: "Inglês Avançado",
+                category: "idiomas",
+                instructor: "Profa. Ana Lima",
+                description: "Desenvolva fluência em inglês para negócios",
+                tags: ["Business English", "Conversation", "Grammar"],
+                enrolled: false
+            },
+            {
+                id: 5,
+                title: "Data Science",
+                category: "tecnologia",
+                instructor: "Prof. Carlos Mendes",
+                description: "Análise de dados com Python e Machine Learning",
+                tags: ["Python", "Pandas", "Machine Learning"],
+                enrolled: false
+            },
+            {
+                id: 6,
+                title: "Gestão de Projetos",
+                category: "negocios",
+                instructor: "Prof. Roberto Silva",
+                description: "Metodologias ágeis e gestão eficiente",
+                tags: ["Scrum", "Kanban", "Leadership"],
+                enrolled: false
+            }
+        ];
+
+        const teachersData = [
+            {
+                id: 1,
+                name: "Prof. João Silva",
+                subjects: ["Programação", "Desenvolvimento Web"],
+                bio: "Especialista em desenvolvimento web com 10 anos de experiência",
+                availability: ["Segunda 14:00-16:00", "Quarta 10:00-12:00"]
+            },
+            {
+                id: 2,
+                name: "Profa. Maria Santos",
+                subjects: ["Marketing", "Comunicação"],
+                bio: "Consultora em marketing digital e estratégias de comunicação",
+                availability: ["Terça 09:00-11:00", "Quinta 15:00-17:00"]
+            },
+            {
+                id: 3,
+                name: "Prof. Pedro Costa",
+                subjects: ["Design", "Arte Digital"],
+                bio: "Designer gráfico e especialista em identidade visual",
+                availability: ["Segunda 10:00-12:00", "Sexta 14:00-16:00"]
+            },
+            {
+                id: 4,
+                name: "Profa. Ana Lima",
+                subjects: ["Inglês", "Literatura"],
+                bio: "Professora de inglês certificada com experiência internacional",
+                availability: ["Terça 14:00-16:00", "Quinta 10:00-12:00"]
+            }
+        ];
+
+        const resourcesData = [
+            {
+                id: 1,
+                title: "Manual de JavaScript",
+                author: "Tech Academy",
+                type: "PDF",
+                url: "https://example.com/js-manual.pdf"
+            },
+            {
+                id: 2,
+                title: "Guia de Marketing Digital",
+                author: "Marketing Pro",
+                type: "PDF",
+                url: "https://example.com/marketing-guide.pdf"
+            },
+            {
+                id: 3,
+                title: "Fundamentos de Design",
+                author: "Design Institute",
+                type: "PDF",
+                url: "https://example.com/design-basics.pdf"
+            }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            startCarousel();
+            loadCourses();
+            loadTeachers();
+            loadResources();
+            initializeCalendar();
+            loadTheme();
+        });
+
+        function initializeApp() {
+            // Load saved data from localStorage
+            const savedCourses = localStorage.getItem('enrolledCourses');
+            if (savedCourses) {
+                const enrolledIds = JSON.parse(savedCourses);
+                coursesData.forEach(course => {
+                    if (enrolledIds.includes(course.id)) {
+                        course.enrolled = true;
+                    }
+                });
+            }
+        }
+
+        // Navigation functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-gray-900');
+                link.classList.add('text-gray-500');
+            });
+            
+            // Highlight current page link
+            const currentLink = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+            if (currentLink && currentLink.classList.contains('nav-link')) {
+                currentLink.classList.remove('text-gray-500');
+                currentLink.classList.add('text-gray-900');
+            }
+            
+            // Close mobile menu
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // Theme functions
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            const icon = document.getElementById('theme-icon');
+            
+            if (isDark) {
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+            }
+        }
+
+        // Carousel functions
+        function startCarousel() {
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+            }
+            carouselInterval = setInterval(() => {
+                if (!isCarouselPaused) {
+                    nextSlide();
+                }
+            }, 4000);
+        }
+
+        function pauseCarousel() {
+            isCarouselPaused = true;
+        }
+
+        function resumeCarousel() {
+            isCarouselPaused = false;
+        }
+
+        function nextSlide() {
+            const items = document.querySelectorAll('.carousel-item');
+            
+            // Remove active from current slide
+            items[currentSlide].classList.remove('active');
+            
+            // Calculate next slide
+            currentSlide = (currentSlide + 1) % items.length;
+            
+            // Add active to new slide
+            items[currentSlide].classList.add('active');
+            
+            // Update indicators
+            updateIndicators();
+        }
+
+        function prevSlide() {
+            const items = document.querySelectorAll('.carousel-item');
+            
+            // Remove active from current slide
+            items[currentSlide].classList.remove('active');
+            
+            // Calculate previous slide
+            currentSlide = currentSlide === 0 ? items.length - 1 : currentSlide - 1;
+            
+            // Add active to new slide
+            items[currentSlide].classList.add('active');
+            
+            // Update indicators
+            updateIndicators();
+        }
+
+        function goToSlide(slideIndex) {
+            const items = document.querySelectorAll('.carousel-item');
+            
+            // Validate slide index
+            if (slideIndex < 0 || slideIndex >= items.length) return;
+            
+            // Remove active from current slide
+            items[currentSlide].classList.remove('active');
+            
+            // Set new slide
+            currentSlide = slideIndex;
+            
+            // Add active to new slide
+            items[currentSlide].classList.add('active');
+            
+            // Update indicators
+            updateIndicators();
+        }
+
+        function updateIndicators() {
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            indicators.forEach((indicator, index) => {
+                if (index === currentSlide) {
+                    indicator.classList.add('bg-opacity-100');
+                    indicator.classList.remove('bg-opacity-60');
+                } else {
+                    indicator.classList.remove('bg-opacity-100');
+                    indicator.classList.add('bg-opacity-60');
+                }
+            });
+        }
+
+        // Courses functions
+        function loadCourses() {
+            const grid = document.getElementById('courses-grid');
+            grid.innerHTML = '';
+            
+            coursesData.forEach(course => {
+                const courseCard = createCourseCard(course);
+                grid.appendChild(courseCard);
+            });
+        }
+
+        function createCourseCard(course) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md p-6 card-hover';
+            card.innerHTML = `
+                <h3 class="text-xl font-semibold mb-2 text-gray-900">${course.title}</h3>
+                <p class="text-gray-600 mb-3">${course.description}</p>
+                <p class="text-sm text-indigo-600 mb-3">Instrutor: ${course.instructor}</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    ${course.tags.map(tag => `<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">${tag}</span>`).join('')}
+                </div>
+                <button onclick="enrollCourse(${course.id})" class="w-full ${course.enrolled ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white py-2 px-4 rounded-md transition-colors">
+                    ${course.enrolled ? 'Matriculado ✓' : 'Inscrever-se'}
+                </button>
+            `;
+            return card;
+        }
+
+        function enrollCourse(courseId) {
+            const course = coursesData.find(c => c.id === courseId);
+            if (course && !course.enrolled) {
+                course.enrolled = true;
+                
+                // Save to localStorage
+                const enrolledCourses = coursesData.filter(c => c.enrolled).map(c => c.id);
+                localStorage.setItem('enrolledCourses', JSON.stringify(enrolledCourses));
+                
+                // Reload courses display
+                loadCourses();
+                
+                // Show success message
+                alert('Inscrição realizada com sucesso!');
+            }
+        }
+
+        function filterCourses() {
+            const filter = document.getElementById('course-filter').value;
+            const search = document.getElementById('course-search').value.toLowerCase();
+            
+            const filteredCourses = coursesData.filter(course => {
+                const matchesFilter = !filter || course.category === filter;
+                const matchesSearch = !search || 
+                    course.title.toLowerCase().includes(search) ||
+                    course.description.toLowerCase().includes(search) ||
+                    course.instructor.toLowerCase().includes(search);
+                
+                return matchesFilter && matchesSearch;
+            });
+            
+            const grid = document.getElementById('courses-grid');
+            grid.innerHTML = '';
+            
+            filteredCourses.forEach(course => {
+                const courseCard = createCourseCard(course);
+                grid.appendChild(courseCard);
+            });
+        }
+
+        function searchCourses() {
+            filterCourses();
+        }
+
+        // Teachers functions
+        function loadTeachers() {
+            const grid = document.getElementById('teachers-grid');
+            grid.innerHTML = '';
+            
+            teachersData.forEach(teacher => {
+                const teacherCard = createTeacherCard(teacher);
+                grid.appendChild(teacherCard);
+            });
+        }
+
+        function createTeacherCard(teacher) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md p-6 card-hover';
+            card.innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-3 flex items-center justify-center">
+                        <i class="fas fa-user text-2xl text-gray-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900">${teacher.name}</h3>
+                </div>
+                <p class="text-gray-600 mb-3">${teacher.bio}</p>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-900 mb-2">Disciplinas:</h4>
+                    <div class="flex flex-wrap gap-2">
+                        ${teacher.subjects.map(subject => `<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">${subject}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-900 mb-2">Horários disponíveis:</h4>
+                    <ul class="text-sm text-gray-600">
+                        ${teacher.availability.map(time => `<li>• ${time}</li>`).join('')}
+                    </ul>
+                </div>
+                <button onclick="scheduleTeacher(${teacher.id})" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+                    Marcar Reunião
+                </button>
+            `;
+            return card;
+        }
+
+        function scheduleTeacher(teacherId) {
+            const teacher = teachersData.find(t => t.id === teacherId);
+            if (teacher) {
+                // Save meeting to localStorage
+                const meetings = JSON.parse(localStorage.getItem('scheduledMeetings') || '[]');
+                const meeting = {
+                    id: Date.now(),
+                    teacherId: teacherId,
+                    teacherName: teacher.name,
+                    date: new Date().toISOString(),
+                    status: 'agendada'
+                };
+                meetings.push(meeting);
+                localStorage.setItem('scheduledMeetings', JSON.stringify(meetings));
+                
+                alert(`Reunião agendada com ${teacher.name}!`);
+            }
+        }
+
+        // Resources functions
+        function loadResources() {
+            const grid = document.getElementById('resources-grid');
+            grid.innerHTML = '';
+            
+            // Load saved resources from localStorage
+            const savedResources = JSON.parse(localStorage.getItem('uploadedResources') || '[]');
+            const allResources = [...resourcesData, ...savedResources];
+            
+            allResources.forEach(resource => {
+                const resourceCard = createResourceCard(resource);
+                grid.appendChild(resourceCard);
+            });
+        }
+
+        function createResourceCard(resource) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md p-6 card-hover';
+            card.innerHTML = `
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-file-pdf text-red-500 text-2xl mr-3"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">${resource.title}</h3>
+                        <p class="text-sm text-gray-600">por ${resource.author}</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="viewResource('${resource.url || '#'}')" class="flex-1 bg-indigo-600 text-white py-2 px-3 rounded-md hover:bg-indigo-700 transition-colors text-sm">
+                        <i class="fas fa-eye mr-1"></i>Visualizar
+                    </button>
+                    <button onclick="downloadResource('${resource.url || '#'}')" class="flex-1 bg-green-600 text-white py-2 px-3 rounded-md hover:bg-green-700 transition-colors text-sm">
+                        <i class="fas fa-download mr-1"></i>Download
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const resource = {
+                    id: Date.now(),
+                    title: file.name,
+                    author: 'Usuário',
+                    type: file.type,
+                    size: file.size,
+                    uploadDate: new Date().toISOString()
+                };
+                
+                // Save to localStorage
+                const savedResources = JSON.parse(localStorage.getItem('uploadedResources') || '[]');
+                savedResources.push(resource);
+                localStorage.setItem('uploadedResources', JSON.stringify(savedResources));
+                
+                // Reload resources
+                loadResources();
+                
+                alert('Arquivo carregado com sucesso!');
+            }
+        }
+
+        function viewResource(url) {
+            if (url === '#') {
+                alert('Visualização não disponível para este arquivo.');
+                return;
+            }
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        function downloadResource(url) {
+            if (url === '#') {
+                alert('Download não disponível para este arquivo.');
+                return;
+            }
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        function searchResources() {
+            const search = document.getElementById('resource-search').value.toLowerCase();
+            const savedResources = JSON.parse(localStorage.getItem('uploadedResources') || '[]');
+            const allResources = [...resourcesData, ...savedResources];
+            
+            const filteredResources = allResources.filter(resource => 
+                resource.title.toLowerCase().includes(search) ||
+                resource.author.toLowerCase().includes(search)
+            );
+            
+            const grid = document.getElementById('resources-grid');
+            grid.innerHTML = '';
+            
+            filteredResources.forEach(resource => {
+                const resourceCard = createResourceCard(resource);
+                grid.appendChild(resourceCard);
+            });
+        }
+
+        // Student area functions
+        function studentLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('student-email').value;
+            const password = document.getElementById('student-password').value;
+            
+            // Simulate login (any email/password works)
+            const student = {
+                id: 1,
+                name: 'João da Silva',
+                email: email,
+                phone: '(11) 99999-9999',
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('currentStudent', JSON.stringify(student));
+            
+            document.getElementById('student-login').classList.add('hidden');
+            document.getElementById('student-dashboard').classList.remove('hidden');
+            
+            loadStudentDashboard();
+        }
+
+        function studentLogout() {
+            localStorage.removeItem('currentStudent');
+            document.getElementById('student-login').classList.remove('hidden');
+            document.getElementById('student-dashboard').classList.add('hidden');
+        }
+
+        function loadStudentDashboard() {
+            const student = JSON.parse(localStorage.getItem('currentStudent'));
+            if (!student) return;
+            
+            // Load profile data
+            document.getElementById('profile-name').value = student.name;
+            document.getElementById('profile-phone').value = student.phone;
+            
+            // Load enrolled courses
+            const enrolledCoursesDiv = document.getElementById('enrolled-courses');
+            const enrolledIds = JSON.parse(localStorage.getItem('enrolledCourses') || '[]');
+            const enrolledCourses = coursesData.filter(course => enrolledIds.includes(course.id));
+            
+            enrolledCoursesDiv.innerHTML = enrolledCourses.length > 0 
+                ? enrolledCourses.map(course => `
+                    <div class="p-3 bg-gray-50 rounded-md">
+                        <h4 class="font-semibold">${course.title}</h4>
+                        <p class="text-sm text-gray-600">${course.instructor}</p>
+                    </div>
+                `).join('')
+                : '<p class="text-gray-500">Nenhum curso matriculado</p>';
+            
+            // Load grades chart
+            loadGradesChart();
+            
+            // Load pending tasks
+            const pendingTasksDiv = document.getElementById('pending-tasks');
+            const tasks = [
+                'Completar módulo 1 - JavaScript',
+                'Entregar projeto final - Marketing',
+                'Participar do fórum - Design'
+            ];
+            
+            pendingTasksDiv.innerHTML = tasks.map(task => `
+                <div class="p-2 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                    <p class="text-sm">${task}</p>
+                </div>
+            `).join('');
+        }
+
+        function loadGradesChart() {
+            const ctx = document.getElementById('grades-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Matemática', 'Português', 'História', 'Ciências'],
+                    datasets: [{
+                        label: 'Notas',
+                        data: [8.5, 9.0, 7.5, 8.8],
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateProfile(event) {
+            event.preventDefault();
+            
+            const student = JSON.parse(localStorage.getItem('currentStudent'));
+            student.name = document.getElementById('profile-name').value;
+            student.phone = document.getElementById('profile-phone').value;
+            
+            localStorage.setItem('currentStudent', JSON.stringify(student));
+            alert('Perfil atualizado com sucesso!');
+        }
+
+        // Teacher area functions
+        function teacherLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('teacher-email').value;
+            const password = document.getElementById('teacher-password').value;
+            
+            // Simulate login
+            const teacher = {
+                id: 1,
+                name: 'Prof. João Silva',
+                email: email,
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('currentTeacher', JSON.stringify(teacher));
+            
+            document.getElementById('teacher-login').classList.add('hidden');
+            document.getElementById('teacher-dashboard').classList.remove('hidden');
+            
+            loadTeacherDashboard();
+        }
+
+        function teacherLogout() {
+            localStorage.removeItem('currentTeacher');
+            document.getElementById('teacher-login').classList.remove('hidden');
+            document.getElementById('teacher-dashboard').classList.add('hidden');
+        }
+
+        function loadTeacherDashboard() {
+            // Load teacher classes
+            const classesDiv = document.getElementById('teacher-classes');
+            const classes = [
+                { name: 'Programação Web - Turma A', students: 25 },
+                { name: 'JavaScript Avançado - Turma B', students: 18 },
+                { name: 'React Fundamentals - Turma C', students: 22 }
+            ];
+            
+            classesDiv.innerHTML = classes.map(cls => `
+                <div class="p-4 bg-gray-50 rounded-md">
+                    <h4 class="font-semibold">${cls.name}</h4>
+                    <p class="text-sm text-gray-600">${cls.students} alunos</p>
+                </div>
+            `).join('');
+            
+            // Load analytics chart
+            loadClassAnalyticsChart();
+        }
+
+        function loadClassAnalyticsChart() {
+            const ctx = document.getElementById('class-analytics-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Média da Turma',
+                        data: [7.2, 7.8, 8.1, 7.9, 8.3, 8.5],
+                        borderColor: 'rgb(34, 197, 94)',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+        }
+
+        function addGrade(event) {
+            event.preventDefault();
+            
+            const student = document.getElementById('student-select').value;
+            const subject = document.getElementById('subject-select').value;
+            const grade = document.getElementById('grade-input').value;
+            
+            // Save grade to localStorage
+            const grades = JSON.parse(localStorage.getItem('studentGrades') || '[]');
+            grades.push({
+                id: Date.now(),
+                student: student,
+                subject: subject,
+                grade: parseFloat(grade),
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('studentGrades', JSON.stringify(grades));
+            
+            // Reset form
+            event.target.reset();
+            
+            alert('Nota lançada com sucesso!');
+        }
+
+        // Calendar functions
+        function initializeCalendar() {
+            updateCalendar();
+            loadUpcomingEvents();
+        }
+
+        function updateCalendar() {
+            const monthNames = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            
+            document.getElementById('calendar-month').textContent = 
+                `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            const calendarGrid = document.querySelector('.calendar-grid');
+            
+            // Remove existing day cells
+            const existingDays = calendarGrid.querySelectorAll('.calendar-day:not(.font-semibold)');
+            existingDays.forEach(day => day.remove());
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day border border-gray-200 p-2';
+                dayElement.textContent = day;
+                
+                // Check if this day has events
+                const dayEvents = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate.getDate() === day && 
+                           eventDate.getMonth() === currentMonth && 
+                           eventDate.getFullYear() === currentYear;
+                });
+                
+                if (dayEvents.length > 0) {
+                    dayElement.classList.add('has-event');
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateCalendar();
+        }
+
+        function showAddEventModal() {
+            document.getElementById('add-event-modal').classList.add('active');
+        }
+
+        function closeAddEventModal() {
+            document.getElementById('add-event-modal').classList.remove('active');
+        }
+
+        function addEvent(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('event-title').value;
+            const date = document.getElementById('event-date').value;
+            const description = document.getElementById('event-description').value;
+            
+            const newEvent = {
+                id: Date.now(),
+                title: title,
+                date: date,
+                description: description
+            };
+            
+            const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+            events.push(newEvent);
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+            
+            updateCalendar();
+            loadUpcomingEvents();
+            closeAddEventModal();
+            
+            // Reset form
+            event.target.reset();
+            
+            alert('Evento adicionado com sucesso!');
+        }
+
+        function loadUpcomingEvents() {
+            const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+            const upcomingEventsDiv = document.getElementById('upcoming-events');
+            
+            // Sort events by date
+            events.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Show next 5 events
+            const upcomingEvents = events.slice(0, 5);
+            
+            if (upcomingEvents.length === 0) {
+                upcomingEventsDiv.innerHTML = '<p class="text-gray-500">Nenhum evento próximo</p>';
+                return;
+            }
+            
+            upcomingEventsDiv.innerHTML = upcomingEvents.map(event => {
+                const eventDate = new Date(event.date);
+                const formattedDate = eventDate.toLocaleDateString('pt-BR');
+                
+                return `
+                    <div class="p-3 bg-gray-50 rounded-md">
+                        <h4 class="font-semibold">${event.title}</h4>
+                        <p class="text-sm text-gray-600">${formattedDate}</p>
+                        ${event.description ? `<p class="text-sm text-gray-500 mt-1">${event.description}</p>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Contact form
+        function submitContact(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const message = document.getElementById('contact-message').value;
+            
+            const contact = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                message: message,
+                date: new Date().toISOString()
+            };
+            
+            const contacts = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+            contacts.push(contact);
+            localStorage.setItem('contactMessages', JSON.stringify(contacts));
+            
+            // Reset form
+            event.target.reset();
+            
+            alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+        }
+
+        // Challenge functions
+        function submitFlag(event) {
+            event.preventDefault();
+            
+            const flagInput = document.getElementById('flag-input').value.trim();
+            const resultDiv = document.getElementById('flag-result');
+            
+            attemptCount++;
+            document.getElementById('attempt-counter').textContent = attemptCount;
+            
+            if (flagInput === correctFlag) {
+                // Success!
+                resultDiv.innerHTML = `
+                    <div class="p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-xl mr-2"></i>
+                            <div>
+                                <h4 class="font-semibold">Parabéns! Flag correta!</h4>
+                                <p class="text-sm">Você completou o desafio com sucesso!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultDiv.classList.remove('hidden');
+                
+                // Show success modal
+                setTimeout(() => {
+                    showSuccessModal();
+                }, 1000);
+                
+            } else {
+                // Wrong flag
+                resultDiv.innerHTML = `
+                    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                        <div class="flex items-center">
+                            <i class="fas fa-times-circle text-xl mr-2"></i>
+                            <div>
+                                <h4 class="font-semibold">Flag incorreta!</h4>
+                                <p class="text-sm">Tente novamente. Lembre-se de explorar todo o portal!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultDiv.classList.remove('hidden');
+                
+                // Clear input
+                document.getElementById('flag-input').value = '';
+            }
+        }
+
+        function showSuccessModal() {
+            const certificateCode = generateCertificateCode();
+            document.getElementById('certificate-code').textContent = certificateCode;
+            document.getElementById('success-modal').classList.add('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.remove('active');
+        }
+
+        function generateCertificateCode() {
+            const timestamp = new Date().toISOString();
+            const randomId = Math.random().toString(36).substr(2, 9);
+            return `CERT-EDUPORTAL-${randomId.toUpperCase()}-${timestamp.substr(0, 10)}`;
+        }
+
+        function downloadCertificate() {
+            const certificateCode = document.getElementById('certificate-code').textContent;
+            const certificateContent = `
+CERTIFICADO DE CONCLUSÃO
+========================
+
+EduPortal - Campus Virtual
+Desafio CTF Concluído com Sucesso
+
+Código do Certificado: ${certificateCode}
+Data de Conclusão: ${new Date().toLocaleDateString('pt-BR')}
+Tentativas: ${attemptCount}
+
+Parabéns por completar o desafio!
+Este certificado comprova que você:
+- Explorou todas as funcionalidades do portal
+- Demonstrou habilidades de investigação
+- Encontrou a flag escondida: ${correctFlag}
+
+Válido como comprovante de participação no desafio CTF.
+
+---
+EduPortal - Educação Digital de Qualidade
+            `;
+            
+            const blob = new Blob([certificateContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `certificado-eduportal-${certificateCode}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentStudent = localStorage.getItem('currentStudent');
+            if (currentStudent) {
+                document.getElementById('student-login').classList.add('hidden');
+                document.getElementById('student-dashboard').classList.remove('hidden');
+                loadStudentDashboard();
+            }
+            
+            const currentTeacher = localStorage.getItem('currentTeacher');
+            if (currentTeacher) {
+                document.getElementById('teacher-login').classList.add('hidden');
+                document.getElementById('teacher-dashboard').classList.remove('hidden');
+                loadTeacherDashboard();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98e07fd063a79477',t:'MTc2MDM3NTkzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
