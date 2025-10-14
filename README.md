@@ -88,7 +88,7 @@ ________________________________________
 The portal is available in two formats, choose whichever you prefer:
 
 - ▶️ **Website (GitHub):** <a href="https://website-htc.vercel.app/" target="_blank" rel="noopener noreferrer"> Access the page via GitHub </a>
-- 🧩 **Room (TryHackMe):** <a href="https://website-htc.vercel.app/" target="_blank" rel="noopener noreferrer"> Access the room via TryHackMe </a>
+- 🧩 **Room (TryHackMe):** <a href="https://tryhackme.com/room/hackthecampus/" target="_blank" rel="noopener noreferrer"> Access the room via TryHackMe </a>
 
 Use GitHub to browse the site directly or join the TryHackMe room to play the integrated challenge.
 
