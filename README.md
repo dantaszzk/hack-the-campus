@@ -83,14 +83,16 @@ ________________________________________
 
 ## 🚀 Join the Challenge
 
-**✉️ A riddle awaits**
+**🌐 Where to Play**
 
-A campus, several pages, and a secret exposed. Gather clues and prove your skills.
+The portal is available in two formats, choose whichever you prefer:
 
-Visit the TryHackMe room to get started: 
-<a href="https://tryhackme.com/room/hackthecampus" target="_blank" rel="noopener noreferrer">
- 🌐 Hack the Campus - CTF
-</a>
+- ▶️ **Website (GitHub):** <a href="https://website-htc.vercel.app/" target="_blank" rel="noopener noreferrer"> Access the page via GitHub </a>
+- 🧩 **Room (TryHackMe):** <a href="https://website-htc.vercel.app/" target="_blank" rel="noopener noreferrer"> Access the room via TryHackMe </a>
+
+Use GitHub to browse the site directly or join the TryHackMe room to play the integrated challenge.
+
+Tip: Choose the TryHackMe room if you want to track your progress; use GitHub to freely inspect the site.
 
 (If the link is not yet public, it will be updated as soon as the room is launched.)
 
